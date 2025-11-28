@@ -38,6 +38,12 @@ python manage.py migrate
 ```bash
 python manage.py runserver
 ```
+
+## Create superuser
+```bash
+python manage.py createsuperuser
+```
+
 ## Test API
 ### Register/Sign In
 ```bash
@@ -48,23 +54,58 @@ Body:
   "email": "quy@example.com",
   "password": "secret123"
 }
+
+Response:
+{
+    "id": 2,
+    "username": "quy",
+    "email": "quy@example.com"
+}
 ```
 ### Login to get token
 ```bash
-POST /api/users/token/
+POST /api/users/login/
 Body:
 {
   "username": "quy",
   "password": "secret123"
+}
+
+Response:
+{
+  "access": "<access_token_here>"
 }
 ```
 ### Access protected endpoint
 ```bash
 GET /api/users/me/
 Header: Authorization: Bearer <access_token_here>
+
 Response:
 {
-  "refresh": "<refresh_token_here>",
+    "id": 2,
+    "username": "quy1",
+    "email": "quy1@example.com",
+    "first_name": "",
+    "last_name": ""
+}
+```
+### Refresh access token and rotate refresh token
+```bash
+POST /api/users/token/refresh/
+
+Response:
+{
   "access": "<access_token_here>"
+}
+```
+### Logout
+```bash
+POST /api/users/logout/
+Header: Authorization: Bearer <access_token_here>
+
+Response:
+{
+  "detail": "Logged out"
 }
 ```
