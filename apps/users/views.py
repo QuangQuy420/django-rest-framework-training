@@ -105,7 +105,6 @@ class LogoutView(APIView):
     POST /api/users/logout/
     Authorization: Bearer <access_token>
     """
-    permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
         refresh_token = request.COOKIES.get("refresh_token")
@@ -128,7 +127,6 @@ class MeView(APIView):
     GET /api/users/me/
     Authorization: Bearer <access_token>
     """
-    permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
         serializer = UserSerializer(request.user)

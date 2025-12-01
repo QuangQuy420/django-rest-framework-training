@@ -109,3 +109,123 @@ Response:
   "detail": "Logged out"
 }
 ```
+### List all Post
+```bash
+GET /api/blog/
+Header: Authorization: Bearer <access_token>
+
+Response:
+{
+  "count": 42,
+  "next": "http://localhost:8000/api/blog/?page=2",
+  "previous": null,
+  "results": [
+    {
+      "id": 1,
+      "title": "Hello",
+      "content": "World",
+      "created_at": "...",
+      "updated_at": "...",
+      "author": { ... },
+      "reactions": [ ... ],
+      "comments": [ ... ]
+    }
+  ]
+}
+
+```
+### Retrieve a Post
+```bash
+GET /api/blog/{id}/
+Header: Authorization: Bearer <access_token>
+
+Response:
+{
+  "id": 1,
+  "title": "Hello",
+  "content": "World",
+  "created_at": "...",
+  "updated_at": "...",
+  "author": { ... },
+  "reactions": [ ... ],
+  "comments": [ ... ]
+}
+```
+### Create a Post
+```bash
+POST /api/blog/
+Header: Authorization: Bearer <access_token>
+
+Body:
+{
+  "title": "My first post",
+  "content": "This is my content"
+}
+
+Response:
+{
+  "id": 10,
+  "title": "My first post",
+  "content": "This is my content",
+  "created_at": "...",
+  "updated_at": "...",
+  "author": { ... },
+  "reactions": [],
+  "comments": []
+}
+```
+### Update a Post (Full Update)
+```bash
+PUT /api/blog/{id}/
+Header: Authorization: Bearer <access_token>
+
+Body:
+{
+  "title": "Updated title",
+  "content": "Updated content"
+}
+
+Response:
+{
+  "id": 10,
+  "title": "Updated title",
+  "content": "Updated content",
+  "created_at": "...",
+  "updated_at": "...",
+  "author": { ... },
+  "reactions": [...],
+  "comments": [...]
+}
+```
+### Partial Update a Post
+```bash
+PATCH /api/blog/{id}/
+Header: Authorization: Bearer <access_token>
+
+Body (example):
+{
+  "title": "Only title changed"
+}
+
+Response:
+{
+  "id": 10,
+  "title": "Updated title",
+  "content": "Updated content",
+  "created_at": "...",
+  "updated_at": "...",
+  "author": { ... },
+  "reactions": [...],
+  "comments": [...]
+}
+```
+### Delete a Post
+```bash
+DELETE /api/blog/{id}/
+Header: Authorization: Bearer <access_token>
+
+Response:
+{
+  "detail": "Post deleted successfully"
+}
+```
