@@ -65,7 +65,7 @@ class Comment(models.Model):
 
 
 class Reaction(models.Model):
-    user = models.ForeignKey(
+    author = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="reactions",
@@ -91,4 +91,4 @@ class Reaction(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.type} by {self.user} on {self.content_object}"
+        return f"{self.type} by {self.author} on {self.content_object}"

@@ -224,8 +224,205 @@ Response:
 DELETE /api/blog/{id}/
 Header: Authorization: Bearer <access_token>
 
+Response: 204 No Content
+```
+### List Comments of a Post
+```bash
+GET /api/blog/{post_id}/comments/
+Header: Authorization: Bearer <access_token>
+
+Response:
+[
+  {
+    "id": 10,
+    "content": "Great article!",
+    "created_at": "2025-01-20T08:15:00Z",
+    "author": {
+      "id": 5,
+      "username": "john"
+    },
+    "reactions": [],
+    "replies": [],
+    "parent": null,
+    "post": 3
+  }
+]
+```
+### Create Comment for a Post
+```bash
+POST /api/blog/{post_id}/comments/
+Header: Authorization: Bearer <access_token>
+
+Body (example):
+{
+  "content": "This is my comment.",
+  "parent": null/post_id
+}
+
 Response:
 {
-  "detail": "Post deleted successfully"
+  "id": 16,
+  "content": "This is my comment.",
+  "created_at": "2025-01-20T08:31:00Z",
+  "author": {
+    "id": 1,
+    "username": "quyphan"
+  },
+  "reactions": [],
+  "replies": [],
+  "parent": 10/null,
+  "post": 3
 }
+```
+### Update comment
+```bash
+PATCH /api/blog/comments/{id}/
+Header: Authorization: Bearer <access_token>
+
+Body (example):
+{
+  "content": "Updated comment text"
+}
+
+Response:
+{
+  "id": 10,
+  "content": "Updated comment text",
+  "created_at": "...",
+  "author": {
+    "id": 1,
+    "username": "quyphan"
+  },
+  "reactions": [],
+  "replies": [],
+  "parent": null,
+  "post": 3
+}
+```
+### Delete a Post
+```bash
+DELETE /api/blog/comments/{id}/
+Header: Authorization: Bearer <access_token>
+
+Response: 204 No Content
+```
+### List Reaction for a Post
+```bash
+GET /api/blog/{post_id}/reactions/
+Header: Authorization: Bearer <access_token>
+
+Response:
+[
+  {
+    "id": 5,
+    "type": "LIKE",
+    "created_at": "2025-01-20T10:00:00Z",
+    "user": {
+      "id": 2,
+      "username": "john"
+    }
+  },
+  {
+    "id": 6,
+    "type": "LOVE",
+    "created_at": "2025-01-20T10:10:00Z",
+    "user": {
+      "id": 3,
+      "username": "anna"
+    }
+  }
+]
+```
+### Create Reaction for a Post
+```bash
+POST /api/blog/{post_id}/reactions/
+Header: Authorization: Bearer <access_token>
+
+Body (example):
+{
+  "type": "like"
+}
+
+Response:
+{
+  "type": "like"
+}
+```
+### List Reaction for a Comment
+```bash
+GET /api/blog/comments/{comment_id}/reactions/
+Header: Authorization: Bearer <access_token>
+
+Response:
+[
+  {
+    "id": 5,
+    "type": "LIKE",
+    "created_at": "2025-01-20T10:00:00Z",
+    "user": {
+      "id": 2,
+      "username": "john"
+    }
+  },
+  {
+    "id": 6,
+    "type": "LOVE",
+    "created_at": "2025-01-20T10:10:00Z",
+    "user": {
+      "id": 3,
+      "username": "anna"
+    }
+  }
+]
+```
+### Create Reaction for a Comment
+```bash
+POST /api/blog/comments/{comment_id}/reactions/
+Header: Authorization: Bearer <access_token>
+
+Body (example):
+{
+  "type": "like"
+}
+
+Response:
+{
+  "type": "like"
+}
+```
+### Update Reaction Type
+```bash
+PATCH /api/blog/reactions/{reaction_id}/
+Header: Authorization: Bearer <access_token>
+
+Body (example):
+{
+  "type": "haha"
+}
+
+Response:
+{
+    "id": 3,
+    "type": "like",
+    "created_at": "2025-12-01T10:44:36.114361Z",
+    "author": {
+        "id": 1,
+        "username": "quy",
+        "email": "quy@gmail.com",
+        "first_name": "",
+        "last_name": ""
+    }
+}
+```
+### Delete Reaction
+```bash
+DELETE /api/blog/reactions/{reaction_id}/
+Header: Authorization: Bearer <access_token>
+
+Body (example):
+{
+  "content": "Updated comment text"
+}
+
+Response: 204 No Content
 ```
