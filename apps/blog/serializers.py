@@ -4,11 +4,11 @@ from apps.users.serializers import UserSerializer
 
 
 class ReactionSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
+    author = UserSerializer(read_only=True)
 
     class Meta:
         model = Reaction
-        fields = ["id", "type", "created_at", "user"]
+        fields = ["id", "type", "created_at", "author"]
 
 
 class CommentReplySerializer(serializers.ModelSerializer):
@@ -28,6 +28,7 @@ class CommentReplySerializer(serializers.ModelSerializer):
             "author",
             "reactions",
             "parent",
+            "post",
         ]
 
 
@@ -46,16 +47,45 @@ class CommentSerializer(serializers.ModelSerializer):
             "reactions",
             "replies",
             "parent",
+            "post",
         ]
 
+    def validate(self, attrs):
+        """
+        Ensure parent comment (if any) belongs to the same post.
+        """
+        post = attrs.get("post") or self.context.get("post")
+        parent = attrs.get("parent")
+
+        if parent and parent.post_id != post.id:
+            raise serializers.ValidationError(
+                {"parent": "Parent comment must belong to the same post."}
+            )
+        return attrs
+
     def get_replies(self, obj):
-        # Only 1 level of replies
-        queryset = obj.replies.all()
-        return CommentReplySerializer(
+        """
+        Recursively return child comments until max_depth is reached.
+        """
+        depth = self.context.get("depth", 0)
+        max_depth = self.context.get("max_depth", 5)
+
+        if depth >= max_depth:
+            return []
+
+        # Get direct children
+        queryset = obj.replies.all().select_related("author").prefetch_related(
+            "reactions",
+            "replies__author",
+            "replies__reactions",
+        )
+
+        serializer = CommentSerializer(
             queryset,
             many=True,
-            context=self.context,
-        ).data
+            context={**self.context, "depth": depth + 1},
+        )
+        return serializer.data
 
 
 class PostSerializer(serializers.ModelSerializer):

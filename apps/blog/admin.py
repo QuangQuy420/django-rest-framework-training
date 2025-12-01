@@ -16,6 +16,6 @@ class CommentAdmin(admin.ModelAdmin):
 
 @admin.register(Reaction)
 class ReactionAdmin(admin.ModelAdmin):
-    list_display = ("id", "user", "type", "content_type", "created_at")
+    list_display = ("id", "author", "type", "content_type", "created_at")
     search_fields = ("user__username", "content_type")
-    list_filter = ("content_type", "created_at", "user")
+    list_filter = ("content_type", "created_at", "author")
