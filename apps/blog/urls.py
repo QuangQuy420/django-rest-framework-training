@@ -1,7 +1,11 @@
 # apps/blog/urls.py
-from django.urls import path
-from .views import PostListCreateAPIView
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import PostViewSet
+
+router = DefaultRouter()
+router.register(r"", PostViewSet, basename="post")
 
 urlpatterns = [
-    # path("", PostListCreateAPIView.as_view(), name="post-list-create"),
+    path("", include(router.urls)),
 ]
