@@ -345,7 +345,16 @@ Body (example):
 
 Response:
 {
-  "type": "like"
+    "id": 1,
+    "type": "haha",
+    "created_at": "2025-12-02T01:57:56.917934Z",
+    "author": {
+        "id": 1,
+        "username": "quy",
+        "email": "quy@gmail.com",
+        "first_name": "",
+        "last_name": ""
+    }
 }
 ```
 ### List Reaction for a Comment
@@ -387,7 +396,16 @@ Body (example):
 
 Response:
 {
-  "type": "like"
+    "id": 1,
+    "type": "haha",
+    "created_at": "2025-12-02T01:57:56.917934Z",
+    "author": {
+        "id": 1,
+        "username": "quy",
+        "email": "quy@gmail.com",
+        "first_name": "",
+        "last_name": ""
+    }
 }
 ```
 ### Update Reaction Type

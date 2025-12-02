@@ -89,6 +89,12 @@ class Reaction(models.Model):
         indexes = [
             models.Index(fields=["content_type", "object_id"]),
         ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["author", "content_type", "object_id"],
+                name="unique_reaction_per_author_object",
+            ),
+        ]
 
     def __str__(self):
         return f"{self.type} by {self.author} on {self.content_object}"
