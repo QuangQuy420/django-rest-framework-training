@@ -6,6 +6,7 @@ from apps.blog.permissions import IsAuthorOrReadOnly
 from django.contrib.contenttypes.models import ContentType
 from .models import Post, Comment, Reaction
 from .serializers import CommentSerializer, PostSerializer, ReactionSerializer
+from django.db import transaction
 
 class PostPagination(PageNumberPagination):
     page_size = 10
@@ -119,15 +120,18 @@ class PostViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
 
         ct = ContentType.objects.get_for_model(Post)
-        Reaction.objects.create(
-            author=request.user,
-            content_type=ct,
-            object_id=post.id,
-            type=serializer.validated_data["type"],
-        )
+        with transaction.atomic():
+            reaction, _created = Reaction.objects.update_or_create(
+                author=request.user,
+                content_type=ct,
+                object_id=post.id,
+                defaults={"type": serializer.validated_data["type"]},
+            )
 
-        # return same serializer (with validated type)
-        return serializer
+        return ReactionSerializer(
+            reaction,
+            context={"request": request},
+        )
 
     @action(
         detail=True,
@@ -189,14 +193,18 @@ class CommentViewSet(
         serializer.is_valid(raise_exception=True)
 
         ct = ContentType.objects.get_for_model(Comment)
-        Reaction.objects.create(
-            author=request.user,
-            content_type=ct,
-            object_id=comment.id,
-            type=serializer.validated_data["type"],
-        )
+        with transaction.atomic():
+            reaction, _created = Reaction.objects.update_or_create(
+                author=request.user,
+                content_type=ct,
+                object_id=comment.id,
+                defaults={"type": serializer.validated_data["type"]},
+            )
 
-        return serializer
+        return ReactionSerializer(
+            reaction,
+            context={"request": request},
+        )
 
     # ---------- /api/blog/comments/{id}/reactions/ ----------
 
