@@ -61,6 +61,16 @@ python manage.py runserver
 python manage.py createsuperuser
 ```
 
+## Run Test
+```bash
+pytest
+```
+
+## Run Test Coverage
+```bash
+pytest --cov=apps --cov-report=term-missing
+```
+
 ## Test API
 ### Register/Sign In
 ```bash
@@ -325,7 +335,7 @@ Response:
 [
   {
     "id": 5,
-    "type": "LIKE",
+    "type": "like",
     "created_at": "2025-01-20T10:00:00Z",
     "user": {
       "id": 2,
@@ -376,7 +386,7 @@ Response:
 [
   {
     "id": 5,
-    "type": "LIKE",
+    "type": "like",
     "created_at": "2025-01-20T10:00:00Z",
     "user": {
       "id": 2,

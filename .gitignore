@@ -17,3 +17,7 @@ env/
 # Environment variables
 *.env
 .env
+
+# Unit test
+coverage/
+.coverage
