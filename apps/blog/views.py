@@ -4,9 +4,13 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from apps.blog.permissions import IsAuthorOrReadOnly
 from django.contrib.contenttypes.models import ContentType
+from apps.notifications.tasks import send_new_comment_email, send_new_reaction_email
 from .models import Post, Comment, Reaction
 from .serializers import CommentSerializer, PostSerializer, ReactionSerializer
 from django.db import transaction
+import logging
+
+logger = logging.getLogger(__name__)
 
 class PostPagination(PageNumberPagination):
     page_size = 10
@@ -74,7 +78,23 @@ class PostViewSet(viewsets.ModelViewSet):
             context={"request": request, "post": post},
         )
         serializer.is_valid(raise_exception=True)
-        serializer.save(author=request.user)
+        comment = serializer.save(author=request.user)
+
+        # Get parent comment author id if this is a reply
+        parent_id = data.get("parent") or request.data.get("parent")
+        parent_author_id = None
+        if parent_id:
+            try:
+                parent_comment = Comment.objects.select_related("author").get(id=parent_id)
+                parent_author_id = parent_comment.author.id
+            except Comment.DoesNotExist:
+                parent_author_id = None
+
+        try:
+            send_new_comment_email.delay(post.author.id, parent_author_id, comment.id)
+        except Exception as e:
+            logger.error("Failed to enqueue reaction email task: %s", e)
+
         return serializer
 
     @action(
@@ -119,14 +139,39 @@ class PostViewSet(viewsets.ModelViewSet):
         )
         serializer.is_valid(raise_exception=True)
 
+        new_type = serializer.validated_data["type"]
         ct = ContentType.objects.get_for_model(Post)
+
+        # 1) Check existing reaction first (to compare types later)
+        existing = Reaction.objects.filter(
+            author=request.user,
+            content_type=ct,
+            object_id=post.id,
+        ).first()
+        old_type = existing.type if existing else None
+
+        # 2) Upsert reaction
         with transaction.atomic():
-            reaction, _created = Reaction.objects.update_or_create(
+            reaction, created = Reaction.objects.update_or_create(
                 author=request.user,
                 content_type=ct,
                 object_id=post.id,
-                defaults={"type": serializer.validated_data["type"]},
+                defaults={"type": new_type},
             )
+
+        # 3) Only send email if:
+        #    - reaction is newly created, OR
+        #    - the type actually changed
+        if created or old_type != reaction.type:
+            try:
+                send_new_reaction_email.delay(
+                    post.author.id,
+                    reaction.type,
+                    "post",
+                    post.id,
+                )
+            except Exception as e:
+                logger.error("Failed to enqueue reaction email task: %s", e)
 
         return ReactionSerializer(
             reaction,
@@ -192,14 +237,40 @@ class CommentViewSet(
         )
         serializer.is_valid(raise_exception=True)
 
+        new_type = serializer.validated_data["type"]
         ct = ContentType.objects.get_for_model(Comment)
+
+        # 1) Check existing reaction first to compare types later
+        existing = Reaction.objects.filter(
+            author=request.user,
+            content_type=ct,
+            object_id=comment.id,
+        ).first()
+
+        old_type = existing.type if existing else None
+
+        # 2) Upsert reaction
         with transaction.atomic():
-            reaction, _created = Reaction.objects.update_or_create(
+            reaction, created = Reaction.objects.update_or_create(
                 author=request.user,
                 content_type=ct,
                 object_id=comment.id,
-                defaults={"type": serializer.validated_data["type"]},
+                defaults={"type": new_type},
             )
+
+        # 3) Only send email if:
+        #    - reaction is newly created, OR
+        #    - the type actually changed
+        if created or old_type != reaction.type:
+            try:
+                send_new_reaction_email.delay(
+                    comment.author.id,
+                    reaction.type,
+                    "comment",
+                    comment.id,
+                )
+            except Exception as e:
+                logger.error("Failed to enqueue reaction email task: %s", e)
 
         return ReactionSerializer(
             reaction,
