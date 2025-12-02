@@ -23,7 +23,7 @@ python manage.py startapp api apps/api
 python manage.py startapp core apps/core
 ```
 
-## Start Postgres
+## Start Postgres and Redis
 ```bash
 docker compose up -d
 ```
@@ -32,6 +32,23 @@ docker compose up -d
 ```bash
 python manage.py makemigrations
 python manage.py migrate
+```
+
+## Create .env file
+```bash
+POSTGRES_DB=drf_db
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=123456
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+
+CELERY_BROKER_URL=redis://localhost:6379/0
+CELERY_RESULT_BACKEND=redis://localhost:6379/0
+```
+
+## Run Celery Worker
+```bash
+celery -A config worker -l info
 ```
 
 ## Run the Development Server
@@ -298,13 +315,6 @@ Response:
   "parent": null,
   "post": 3
 }
-```
-### Delete a Post
-```bash
-DELETE /api/blog/comments/{id}/
-Header: Authorization: Bearer <access_token>
-
-Response: 204 No Content
 ```
 ### List Reaction for a Post
 ```bash
