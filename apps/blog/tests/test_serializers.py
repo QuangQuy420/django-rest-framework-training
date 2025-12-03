@@ -1,7 +1,8 @@
 from django.test import TestCase
-from apps.blog.models import Post, Comment
+
 from apps.blog.serializers import CommentSerializer
-from .factories import PostFactory, CommentFactory, UserFactory
+
+from .factories import CommentFactory, PostFactory
 
 
 class CommentSerializerTests(TestCase):

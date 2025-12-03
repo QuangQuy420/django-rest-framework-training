@@ -1,6 +1,8 @@
 from rest_framework import serializers
-from .models import Post, Comment, Reaction
+
 from apps.users.serializers import UserSerializer
+
+from .models import Comment, Post, Reaction
 
 
 class ReactionSerializer(serializers.ModelSerializer):

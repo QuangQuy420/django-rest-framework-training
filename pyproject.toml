@@ -1,0 +1,10 @@
+[tool.ruff]
+select = ["E", "F", "I"]   # Rules: errors, pep8, imports
+line-length = 120
+fix = true
+exclude = [
+    "migrations",
+]
+
+[tool.ruff.format]
+quote-style = "double"

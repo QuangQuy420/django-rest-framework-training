@@ -1,11 +1,11 @@
-from django.test import TestCase, override_settings
 from django.core import mail
+from django.test import TestCase, override_settings
 
+from apps.blog.tests.factories import CommentFactory, PostFactory, UserFactory
 from apps.notifications.tasks import (
     send_new_comment_email,
     send_new_reaction_email,
 )
-from apps.blog.tests.factories import UserFactory, PostFactory, CommentFactory
 
 
 @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
