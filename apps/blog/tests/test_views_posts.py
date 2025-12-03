@@ -17,7 +17,6 @@ class PostAPITests(APITestCase):
         self.client.force_authenticate(self.user)
         self.post = PostFactory(author=self.user)
 
-
     def _post_list_url(self):
         return reverse("post-list")
 
@@ -29,7 +28,6 @@ class PostAPITests(APITestCase):
 
     def _post_reactions_url(self, post_id=None):
         return reverse("post-reactions", kwargs={"pk": post_id or self.post.id})
-
 
     def test_list_posts(self):
         PostFactory()  # another post
@@ -91,7 +89,6 @@ class PostAPITests(APITestCase):
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
-
     def test_get_post_comments(self):
         CommentFactory(post=self.post, author=self.user)
         CommentFactory(post=self.post)
@@ -114,7 +111,6 @@ class PostAPITests(APITestCase):
         self.assertEqual(resp.data["content"], "Great post!")
         self.assertEqual(resp.data["author"]["id"], self.user.id)
         self.assertEqual(resp.data["post"], self.post.id)
-
 
     def test_get_post_reactions(self):
         ReactionFactory.for_post(post=self.post, author=self.user, type="like")

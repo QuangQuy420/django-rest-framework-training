@@ -18,6 +18,7 @@ class CommentReplySerializer(serializers.ModelSerializer):
     Used for replies only (1 level deep).
     No `replies` field here → avoids deep recursion.
     """
+
     author = UserSerializer(read_only=True)
     reactions = ReactionSerializer(many=True, read_only=True)
 
@@ -60,9 +61,7 @@ class CommentSerializer(serializers.ModelSerializer):
         parent = attrs.get("parent")
 
         if parent and parent.post_id != post.id:
-            raise serializers.ValidationError(
-                {"parent": "Parent comment must belong to the same post."}
-            )
+            raise serializers.ValidationError({"parent": "Parent comment must belong to the same post."})
         return attrs
 
     def get_replies(self, obj):
@@ -76,10 +75,14 @@ class CommentSerializer(serializers.ModelSerializer):
             return []
 
         # Get direct children
-        queryset = obj.replies.all().select_related("author").prefetch_related(
-            "reactions",
-            "replies__author",
-            "replies__reactions",
+        queryset = (
+            obj.replies.all()
+            .select_related("author")
+            .prefetch_related(
+                "reactions",
+                "replies__author",
+                "replies__reactions",
+            )
         )
 
         serializer = CommentSerializer(

@@ -13,6 +13,6 @@ class IsAuthorOrReadOnly(permissions.BasePermission):
             return True
 
         # Only the author can update/delete
-        print('obj', obj.author)
-        print('request', request.user)
+        print("obj", obj.author)
+        print("request", request.user)
         return obj.author == request.user

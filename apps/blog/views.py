@@ -15,6 +15,7 @@ from .serializers import CommentSerializer, PostSerializer, ReactionSerializer
 
 logger = logging.getLogger(__name__)
 
+
 class PostPagination(PageNumberPagination):
     page_size = 10
 
@@ -29,21 +30,16 @@ class PostViewSet(viewsets.ModelViewSet):
       - PATCH  /api/blog/{id}/   -> partial update
       - DELETE /api/blog/{id}/   -> delete post
     """
+
     serializer_class = PostSerializer
     permission_classes = [permissions.IsAuthenticated, IsAuthorOrReadOnly]
     pagination_class = PostPagination
 
     def get_queryset(self):
-        return (
-            Post.objects
-            .select_related("author")
-            .prefetch_related(
-                "reactions",
-                "comments__author",
-                "comments__reactions",
-                "comments__replies__author",
-                "comments__replies__reactions",
-            )
+        return Post.objects.select_related("author").prefetch_related(
+            "reactions",
+            "comments__author",
+            "comments__reactions",
         )
 
     def perform_create(self, serializer):
@@ -52,8 +48,7 @@ class PostViewSet(viewsets.ModelViewSet):
     # helper methods for comments on this post
     def _get_post_comments(self, post, request):
         comments = (
-            post.comments
-            .filter(parent__isnull=True)
+            post.comments.filter(parent__isnull=True)
             .select_related("author")
             .prefetch_related(
                 "reactions",
@@ -100,12 +95,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
         return serializer
 
-    @action(
-        detail=True,
-        methods=["get", "post"],
-        url_path="comments",
-        permission_classes=[permissions.IsAuthenticated]
-    )
+    @action(detail=True, methods=["get", "post"], url_path="comments", permission_classes=[permissions.IsAuthenticated])
     def comments(self, request, pk=None):
         """
         - GET  /api/blog/{post_id}/comments/  -> list top-level comments for this post
@@ -120,15 +110,11 @@ class PostViewSet(viewsets.ModelViewSet):
         # POST
         serializer = self._create_post_comment(post, request)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-    
+
     # helper methods for reactions on this post
     def _get_post_reactions(self, post, request):
         ct = ContentType.objects.get_for_model(Post)
-        reactions = (
-            Reaction.objects
-            .filter(content_type=ct, object_id=post.id)
-            .select_related("author")
-        )
+        reactions = Reaction.objects.filter(content_type=ct, object_id=post.id).select_related("author")
         return ReactionSerializer(
             reactions,
             many=True,
@@ -182,10 +168,7 @@ class PostViewSet(viewsets.ModelViewSet):
         )
 
     @action(
-        detail=True,
-        methods=["get", "post"],
-        url_path="reactions",
-        permission_classes=[permissions.IsAuthenticated]
+        detail=True, methods=["get", "post"], url_path="reactions", permission_classes=[permissions.IsAuthenticated]
     )
     def reactions(self, request, pk=None):
         """
@@ -212,6 +195,7 @@ class CommentViewSet(
       - PATCH /api/blog/comments/{id}/   -> update comment content
       - DELETE /api/blog/comments/{id}/  -> delete comment
     """
+
     queryset = Comment.objects.select_related("author", "post", "parent")
     serializer_class = CommentSerializer
     permission_classes = [permissions.IsAuthenticated, IsAuthorOrReadOnly]
@@ -222,11 +206,7 @@ class CommentViewSet(
     # helper methods for reactions on this comment
     def _get_comment_reactions(self, comment, request):
         ct = ContentType.objects.get_for_model(Comment)
-        reactions = (
-            Reaction.objects
-            .filter(content_type=ct, object_id=comment.id)
-            .select_related("author")
-        )
+        reactions = Reaction.objects.filter(content_type=ct, object_id=comment.id).select_related("author")
         return ReactionSerializer(
             reactions,
             many=True,
@@ -283,10 +263,7 @@ class CommentViewSet(
     # ---------- /api/blog/comments/{id}/reactions/ ----------
 
     @action(
-        detail=True,
-        methods=["get", "post"],
-        url_path="reactions",
-        permission_classes=[permissions.IsAuthenticated]
+        detail=True, methods=["get", "post"], url_path="reactions", permission_classes=[permissions.IsAuthenticated]
     )
     def reactions(self, request, pk=None):
         """
@@ -314,6 +291,7 @@ class ReactionViewSet(
       - PATCH /api/blog/reactions/{id}/   -> update reaction type
       - DELETE /api/blog/reactions/{id}/  -> delete reaction
     """
+
     queryset = Reaction.objects.select_related("author", "content_type")
     serializer_class = ReactionSerializer
     permission_classes = [permissions.IsAuthenticated, IsAuthorOrReadOnly]

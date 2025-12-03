@@ -10,11 +10,13 @@ class PostAdmin(admin.ModelAdmin):
     list_filter = ("created_at", "author")
     ordering = ("-created_at",)
 
+
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
     list_display = ("id", "post", "author", "parent", "created_at")
     search_fields = ("content", "author__username", "post__title")
     list_filter = ("created_at", "author")
+
 
 @admin.register(Reaction)
 class ReactionAdmin(admin.ModelAdmin):
