@@ -1,8 +1,8 @@
-from rest_framework.test import APITestCase, APIClient
-from rest_framework import status
 from django.urls import reverse
+from rest_framework import status
+from rest_framework.test import APIClient, APITestCase
 
-from .factories import UserFactory, PostFactory, CommentFactory
+from .factories import CommentFactory, PostFactory, UserFactory
 
 
 class CommentAPITests(APITestCase):

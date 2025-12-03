@@ -1,10 +1,12 @@
-from rest_framework.test import APITestCase, APIClient
-from rest_framework import status
-from django.urls import reverse
 from unittest.mock import patch
 
-from .factories import CommentFactory, ReactionFactory, UserFactory, PostFactory
+from django.urls import reverse
+from rest_framework import status
+from rest_framework.test import APIClient, APITestCase
+
 from apps.blog.models import Reaction
+
+from .factories import CommentFactory, PostFactory, ReactionFactory, UserFactory
 
 
 class PostReactionAPITests(APITestCase):

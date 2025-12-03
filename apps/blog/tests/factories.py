@@ -1,7 +1,8 @@
 import factory
 from django.contrib.auth import get_user_model
-from apps.blog.models import Post, Comment, Reaction
 from django.contrib.contenttypes.models import ContentType
+
+from apps.blog.models import Comment, Post, Reaction
 
 User = get_user_model()
 

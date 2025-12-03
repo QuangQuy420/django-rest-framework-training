@@ -1,7 +1,8 @@
 # apps/blog/urls.py
-from django.urls import path, include
+from django.urls import include, path
 from rest_framework.routers import DefaultRouter
-from .views import PostViewSet, CommentViewSet, ReactionViewSet
+
+from .views import CommentViewSet, PostViewSet, ReactionViewSet
 
 router = DefaultRouter()
 router.register(r"", PostViewSet, basename="post")

@@ -1,7 +1,8 @@
 from celery import shared_task
-from django.core.mail import send_mail
-from apps.blog.models import Comment, Post
 from django.contrib.auth import get_user_model
+from django.core.mail import send_mail
+
+from apps.blog.models import Comment, Post
 
 User = get_user_model()
 
