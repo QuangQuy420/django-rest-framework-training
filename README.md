@@ -1,3 +1,7 @@
+# Django REST Framework Blog API
+
+A modular Django REST Framework project with authentication, blog posts, comments, reactions, Celery for async tasks, Redis, PostgreSQL, and JWT authentication using SimpleJWT.
+
 ## Create environment
 ```bash
 python -m venv .venv
@@ -59,6 +63,11 @@ python manage.py runserver
 ## Create superuser
 ```bash
 python manage.py createsuperuser
+```
+
+## Run Lint
+```bash
+ruff check . --fix && ruff format .
 ```
 
 ## Run Test

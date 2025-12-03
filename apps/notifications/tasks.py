@@ -6,6 +6,7 @@ from apps.blog.models import Comment, Post
 
 User = get_user_model()
 
+
 @shared_task
 def send_new_comment_email(author_id, parent_comment_author_id, comment_id):
     post_author = User.objects.get(id=author_id)
@@ -35,6 +36,7 @@ def send_new_comment_email(author_id, parent_comment_author_id, comment_id):
             [parent_comment_author.email],
             fail_silently=False,
         )
+
 
 @shared_task
 def send_new_reaction_email(recipient_user_id, reaction_type, content_type, object_id):

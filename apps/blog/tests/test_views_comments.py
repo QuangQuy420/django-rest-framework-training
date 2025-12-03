@@ -12,13 +12,11 @@ class CommentAPITests(APITestCase):
         self.client.force_authenticate(self.user)
         self.post = PostFactory()
 
-
     def _post_comments_url(self, post_id=None):
         return reverse("post-comments", kwargs={"pk": post_id or self.post.id})
 
     def _comment_detail_url(self, comment_id):
         return reverse("comment-detail", kwargs={"pk": comment_id})
-
 
     def test_list_comments_of_post(self):
         CommentFactory(post=self.post)
@@ -59,7 +57,6 @@ class CommentAPITests(APITestCase):
         self.assertEqual(resp.data["parent"], parent.id)
         self.assertEqual(resp.data["post"], self.post.id)
         self.assertEqual(resp.data["author"]["id"], self.user.id)
-
 
     def test_update_comment(self):
         comment = CommentFactory(post=self.post, author=self.user)

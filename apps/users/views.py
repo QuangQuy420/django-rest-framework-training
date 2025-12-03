@@ -23,6 +23,7 @@ class RegisterView(generics.CreateAPIView):
       "password": "secret123"
     }
     """
+
     queryset = User.objects.all()
     serializer_class = RegisterSerializer
     permission_classes = [permissions.AllowAny]
@@ -36,6 +37,7 @@ class CookieTokenObtainPairView(TokenObtainPairView):
       "password": "..."
     }
     """
+
     serializer_class = TokenObtainPairSerializer
 
     def post(self, request, *args, **kwargs):
@@ -115,7 +117,7 @@ class LogoutView(APIView):
         if refresh_token:
             try:
                 token = RefreshToken(refresh_token)
-                token.blacklist()      # Blacklist token (cannot be used again)
+                token.blacklist()  # Blacklist token (cannot be used again)
             except Exception:
                 pass
 
