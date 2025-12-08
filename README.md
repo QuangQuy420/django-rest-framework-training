@@ -5,6 +5,11 @@ A modular Django REST Framework project with authentication, blog posts, comment
 ==============================================================
 
 ## How to Start the Application with Docker (Recommended for WSL or Linux environments)
+### Configure .env (Edit if any)
+```bash
+cp .env.example .env
+```
+
 ### Build and Start
 ```bash
 docker compose up --build
@@ -49,17 +54,9 @@ pip install -r requirements.txt
 
 ##### (If that fails on psycopg2, run pip install psycopg2-binary manually).
 
-### Configure .env
+### Configure .env (Edit if any)
 ```bash
-POSTGRES_DB=drf_db
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=123456
-POSTGRES_HOST=localhost
-POSTGRES_PORT=5432
-
-# If you installed Memurai/Redis on default port:
-CELERY_BROKER_URL=redis://localhost:6379/0
-CELERY_RESULT_BACKEND=redis://localhost:6379/0
+cp .env.example .env
 ```
 
 ### Run Migration
