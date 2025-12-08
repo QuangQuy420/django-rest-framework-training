@@ -2,43 +2,54 @@
 
 A modular Django REST Framework project with authentication, blog posts, comments, reactions, Celery for async tasks, Redis, PostgreSQL, and JWT authentication using SimpleJWT.
 
-## Create environment
+==============================================================
+
+## How to Start the Application with Docker (Recommended for WSL or Linux environments)
+### Build and Start
+```bash
+docker compose up --build
+```
+
+### Apply Migrations
+```bash
+docker compose exec web python manage.py migrate
+```
+
+### Create Superuser (Optional)
+```bash
+docker compose exec web python manage.py createsuperuser
+```
+
+### You can now access your API at http://localhost:8000
+
+==============================================================
+
+## How to start application with Windows
+### Since you aren't using Docker images, you must install the software directly on your machine.
+#### - PostgreSQL:
+##### + Download the PostgreSQL Installer for Windows.
+##### + During installation, set the password to 123456 (to match your .env) or update your .env later.
+##### + Open pgAdmin (installed with Postgres) or a terminal and create a database named drf_db.
+
+#### - Redis:
+##### + Redis does not run natively on Windows.
+##### + Option A (Recommended): Install Memurai (Developer Edition). It is a Redis-compatible cache for Windows.
+##### + Option B: Download the archived Microsoft Redis port. (Note: This is very old/outdated but works for simple testing).
+
+### Create a virtual environment:
 ```bash
 python -m venv .venv
 source .venv/bin/activate
 ```
 
-## Create Django project inside "config" package
+### Install libraries: Important: You might need to install psycopg2-binary instead of psycopg2 on Windows to avoid build errors.
 ```bash
-django-admin startproject config .
+pip install -r requirements.txt
 ```
 
-## Freeze requirements
-```bash
-pip freeze > requirements.txt
-```
+##### (If that fails on psycopg2, run pip install psycopg2-binary manually).
 
-## Create folder in apps/ directory
-```bash
-python manage.py startapp users apps/users
-python manage.py startapp blog apps/blog
-python manage.py startapp notifications apps/notifications
-python manage.py startapp api apps/api
-python manage.py startapp core apps/core
-```
-
-## Start Postgres and Redis
-```bash
-docker compose up -d
-```
-
-## Run migrations
-```bash
-python manage.py makemigrations
-python manage.py migrate
-```
-
-## Create .env file
+### Configure .env
 ```bash
 POSTGRES_DB=drf_db
 POSTGRES_USER=postgres
@@ -46,25 +57,32 @@ POSTGRES_PASSWORD=123456
 POSTGRES_HOST=localhost
 POSTGRES_PORT=5432
 
+# If you installed Memurai/Redis on default port:
 CELERY_BROKER_URL=redis://localhost:6379/0
 CELERY_RESULT_BACKEND=redis://localhost:6379/0
 ```
 
-## Run Celery Worker
+### Run Migration
 ```bash
-celery -A config worker -l info
+python manage.py migrate
 ```
 
-## Run the Development Server
+### Start Server
 ```bash
 python manage.py runserver
 ```
 
-## Create superuser
+### Run Celery Worker (Critical Change) Celery's default execution pool (prefork) does not work on Windows. You must use the solo or threads pool.
 ```bash
-python manage.py createsuperuser
+# Add --pool=solo flag
+celery -A config worker -l info --pool=solo
 ```
 
+### You can now access your API at http://localhost:8000
+
+==============================================================
+
+## (Optional)
 ## Run Lint
 ```bash
 ruff check . --fix && ruff format .
@@ -80,7 +98,9 @@ pytest
 pytest --cov=apps --cov-report=term-missing
 ```
 
-## Test API
+==============================================================
+
+# Test API - Postman
 ### Register/Sign In
 ```bash
 POST /api/users/register/

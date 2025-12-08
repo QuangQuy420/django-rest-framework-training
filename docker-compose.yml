@@ -1,6 +1,45 @@
 version: '3.9'
 
 services:
+  # --- Backend API (Django) ---
+  web:
+    build: .
+    container_name: drf_web
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app  # Syncs your code so changes update immediately (Hot Reload)
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      # Override .env localhost with docker service names
+      - POSTGRES_HOST=db
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - db
+      - redis
+
+  # --- Celery Worker ---
+  celery:
+    build: .
+    container_name: drf_celery
+    command: celery -A config worker -l info
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    environment:
+      # Override .env localhost with docker service names
+      - POSTGRES_HOST=db
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - db
+      - redis
+
+  # --- Database ---
   db:
     image: postgres:16
     container_name: drf_postgres
@@ -12,6 +51,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  # --- Redis ---
   redis:
     image: redis:7-alpine
     container_name: drf_redis
