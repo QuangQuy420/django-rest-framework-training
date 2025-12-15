@@ -14,6 +14,7 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
+from celery.schedules import crontab
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -161,6 +162,17 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Celery Configuration Options
 CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://localhost:6379/0")
 CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", "redis://localhost:6379/0")
+
+CELERY_BEAT_SCHEDULE = {
+    "check-db-health-every-minute": {
+        "task": "apps.notifications.tasks.check_db_health",
+        "schedule": crontab(minute="*"),  # Every minute
+    },
+    "daily-signup-report": {
+        "task": "apps.notifications.tasks.send_daily_signup_report",
+        "schedule": crontab(hour=23, minute=55),
+    },
+}
 
 # Email Configuration
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
