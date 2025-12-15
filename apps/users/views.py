@@ -9,6 +9,8 @@ from rest_framework_simplejwt.serializers import (
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
+from apps.notifications.tasks import send_email_to_signed_up_user
+
 from .serializers import RegisterSerializer, UserSerializer
 
 User = get_user_model()
@@ -27,6 +29,15 @@ class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = RegisterSerializer
     permission_classes = [permissions.AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+        data = response.data
+
+        # Send email verification
+        send_email_to_signed_up_user.delay(data.get("id"))
+
+        return response
 
 
 class CookieTokenObtainPairView(TokenObtainPairView):

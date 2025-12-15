@@ -21,3 +21,6 @@ env/
 # Unit test
 coverage/
 .coverage
+
+# Celery beat schedule file
+celerybeat-schedule*

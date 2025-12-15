@@ -19,7 +19,7 @@ cp .env.example .env
 
 ### 1.3. Build and Start
 ```bash
-docker compose up --build
+docker compose up -d --build
 ```
 
 ### 1.4. Apply Migrations
